@@ -1,0 +1,116 @@
+<?php
+/**
+ * Plugin Name: Scroll Grid Experience
+ * Description: Full-screen, scroll-linked animated landing section with a parallax grid background.
+ * Version: 1.0
+ * Author: Antigravity
+ */
+
+if ( ! defined( 'ABSPATH' ) ) {
+    exit;
+}
+
+function sge_enqueue_assets() {
+    if ( ! is_singular() ) {
+        return;
+    }
+
+    wp_enqueue_style(
+        'sge-style',
+        plugin_dir_url( __FILE__ ) . 'scroll-grid.css',
+        [],
+        '1.0'
+    );
+
+    wp_enqueue_script(
+        'gsap',
+        'https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js',
+        [],
+        '3.12.2',
+        true
+    );
+
+    wp_enqueue_script(
+        'gsap-scrolltrigger',
+        'https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/ScrollTrigger.min.js',
+        [ 'gsap' ],
+        '3.12.2',
+        true
+    );
+
+    wp_enqueue_script(
+        'sge-script',
+        plugin_dir_url( __FILE__ ) . 'scroll-grid.js',
+        [ 'gsap-scrolltrigger' ],
+        '1.0',
+        true
+    );
+}
+add_action( 'wp_enqueue_scripts', 'sge_enqueue_assets' );
+
+function sge_render_experience() {
+    ob_start();
+    ?>
+    <div class="sge-scroll-root">
+        <div class="sge-grid"></div>
+
+        <!-- Plinko overlay - full screen -->
+        <div class="sge-plinko">
+            <!-- Pinball planks/levers at bounce points -->
+            <div class="sge-plank sge-plank-left sge-plank-1"></div>
+            <div class="sge-plank sge-plank-right sge-plank-2"></div>
+            <div class="sge-plank sge-plank-left sge-plank-3"></div>
+            <div class="sge-plank sge-plank-right sge-plank-4"></div>
+            <div class="sge-plank sge-plank-left sge-plank-5"></div>
+            <div class="sge-plank sge-plank-right sge-plank-6"></div>
+            
+            <div class="sge-plinko-ball"></div>
+        </div>
+        
+        <!-- Text reveals - FOREGROUND -->
+        <div class="sge-reveals">
+            <div class="sge-reveal sge-reveal-1">
+                <h2>Map Your Workflow</h2>
+            </div>
+            <div class="sge-reveal sge-reveal-3">
+                <h2>Build Automation</h2>
+            </div>
+            <div class="sge-reveal sge-reveal-5">
+                <h2>Track Results</h2>
+            </div>
+            <div class="sge-reveal sge-reveal-2">
+                <h2>Find the Friction</h2>
+            </div>
+            <div class="sge-reveal sge-reveal-4">
+                <h2>Deploy Fast</h2>
+            </div>
+            <div class="sge-reveal sge-reveal-6">
+                <h2>Prove ROI</h2>
+            </div>
+        </div>
+
+        <section class="sge-panel sge-panel-1">
+            <div class="sge-panel-inner">
+                <h1>Advisory Without the Bloat</h1>
+                <p>Turn annoying screen work into digital employees.</p>
+            </div>
+        </section>
+
+        <section class="sge-panel sge-panel-2">
+            <div class="sge-panel-inner">
+                <h2>Map → Build → Measure</h2>
+                <p>Scroll to move through each stage of the workflow.</p>
+            </div>
+        </section>
+
+        <section class="sge-panel sge-panel-3">
+            <div class="sge-panel-inner">
+                <h2>Proof, Not Hype</h2>
+                <p>We track hours saved and revenue won, not logins.</p>
+            </div>
+        </section>
+    </div>
+    <?php
+    return ob_get_clean();
+}
+add_shortcode( 'scroll_grid_experience', 'sge_render_experience' );

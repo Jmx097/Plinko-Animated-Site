@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Scroll Grid Experience Demo</title>
+    <link rel="stylesheet" href="scroll-grid.css" />
+  </head>
+  <body>
+    <div class="sge-scroll-root">
+      <div class="sge-grid"></div>
+
+      <!-- Plinko overlay - full screen -->
+      <div class="sge-plinko">
+        <!-- Pinball planks/levers at bounce points -->
+        <div class="sge-plank sge-plank-left sge-plank-1"></div>
+        <div class="sge-plank sge-plank-right sge-plank-2"></div>
+        <div class="sge-plank sge-plank-left sge-plank-3"></div>
+        <div class="sge-plank sge-plank-right sge-plank-4"></div>
+        <div class="sge-plank sge-plank-left sge-plank-5"></div>
+        <div class="sge-plank sge-plank-right sge-plank-6"></div>
+        
+        <div class="sge-plinko-ball"></div>
+      </div>
+      
+      <!-- Text reveals - FOREGROUND -->
+      <div class="sge-reveals">
+        <div class="sge-reveal sge-reveal-1">
+          <h2>Map Your Workflow</h2>
+        </div>
+        <div class="sge-reveal sge-reveal-3">
+          <h2>Build Automation</h2>
+        </div>
+        <div class="sge-reveal sge-reveal-5">
+          <h2>Track Results</h2>
+        </div>
+        <div class="sge-reveal sge-reveal-2">
+          <h2>Find the Friction</h2>
+        </div>
+        <div class="sge-reveal sge-reveal-4">
+          <h2>Deploy Fast</h2>
+        </div>
+        <div class="sge-reveal sge-reveal-6">
+          <h2>Prove ROI</h2>
+        </div>
+      </div>
+
+      <section class="sge-panel sge-panel-1">
+        <div class="sge-panel-inner">
+          <h1>Advisory Without the Bloat</h1>
+          <p>Turn annoying screen work into digital employees.</p>
+        </div>
+      </section>
+
+      <section class="sge-panel sge-panel-2">
+        <div class="sge-panel-inner">
+          <h2>Map → Build → Measure</h2>
+          <p>Scroll to move through each stage of the workflow.</p>
+        </div>
+      </section>
+
+      <section class="sge-panel sge-panel-3">
+        <div class="sge-panel-inner">
+          <h2>Proof, Not Hype</h2>
+          <p>We track hours saved and revenue won, not logins.</p>
+        </div>
+      </section>
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/ScrollTrigger.min.js"></script>
+    <script src="scroll-grid.js"></script>
+  </body>
+</html>

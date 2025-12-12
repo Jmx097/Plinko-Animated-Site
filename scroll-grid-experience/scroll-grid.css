@@ -1,0 +1,186 @@
+html,
+body {
+  margin: 0;
+  padding: 0;
+}
+
+.sge-scroll-root {
+  position: relative;
+  min-height: 300vh;
+  overflow-x: hidden;
+  background: #020617;
+  color: #f9fafb;
+  font-family: system-ui, -apple-system, BlinkMacSystemFont, "SF Pro Text",
+    "Segoe UI", sans-serif;
+}
+
+/* Moving grid background */
+.sge-grid {
+  position: fixed;
+  inset: -50%;
+  z-index: -1;
+  opacity: 0.25;
+  background-color: #020617;
+  background-image: linear-gradient(
+      to right,
+      rgba(148, 163, 184, 0.3) 1px,
+      transparent 1px
+    ),
+    linear-gradient(to bottom, rgba(148, 163, 184, 0.3) 1px, transparent 1px);
+  background-size: 80px 80px;
+}
+
+/* Panels */
+.sge-panel {
+  height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 4rem 1.5rem;
+  box-sizing: border-box;
+}
+
+.sge-panel-inner {
+  max-width: 720px;
+  text-align: center;
+}
+
+.sge-panel-1 h1 {
+  font-size: clamp(2.5rem, 4vw, 3.5rem);
+  margin-bottom: 1rem;
+}
+
+.sge-panel h2 {
+  font-size: clamp(2rem, 3vw, 2.6rem);
+  margin-bottom: 0.75rem;
+}
+
+.sge-panel p {
+  font-size: 1.05rem;
+  line-height: 1.6;
+  opacity: 0.9;
+}
+
+.sge-panel-1 {
+  color: #e5e7eb;
+}
+.sge-panel-2 {
+  color: #a5b4fc;
+}
+.sge-panel-3 {
+  color: #6ee7b7;
+}
+
+/* Plinko board overlay - BACKGROUND */
+.sge-plinko {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 5;
+  overflow: hidden;
+}
+
+/* The ball - SILVER & LARGER */
+.sge-plinko-ball {
+  position: absolute;
+  top: 5%;
+  left: 50%;
+  width: clamp(150px, 25vw, 300px);
+  height: clamp(150px, 25vw, 300px);
+  border-radius: 999px;
+  background: radial-gradient(circle at 30% 30%, #ffffff, #e2e8f0 30%, #94a3b8 60%, #64748b 100%);
+  box-shadow: 
+    0 0 80px rgba(148, 163, 184, 0.7),
+    0 0 160px rgba(148, 163, 184, 0.4),
+    inset 0 -15px 40px rgba(0, 0, 0, 0.3),
+    inset 0 10px 20px rgba(255, 255, 255, 0.4);
+  transform: translate3d(-50%, 0, 0);
+  will-change: transform;
+  z-index: 2;
+}
+
+/* Pinball planks/levers - start invisible */
+.sge-plank {
+  position: absolute;
+  width: clamp(120px, 18vw, 220px);
+  height: 16px;
+  background: linear-gradient(90deg, #3b82f6, #60a5fa, #3b82f6);
+  border-radius: 8px;
+  box-shadow: 
+    0 0 30px rgba(59, 130, 246, 0.7),
+    0 0 60px rgba(59, 130, 246, 0.4);
+  z-index: 3;
+  opacity: 0;
+}
+
+/* Left planks - angled down to the left (bottom-left of ball) */
+.sge-plank-left {
+  left: 3%;
+  transform: rotate(25deg);
+}
+
+/* Right planks - angled down to the right (bottom-right of ball) */
+.sge-plank-right {
+  right: 3%;
+  transform: rotate(-25deg);
+}
+
+/* Plank positions - fine-tuned to bottom edge of ball */
+/* Plank positions - fine-tuned to bottom edge of ball */
+.sge-plank-1 { top: 46%; } 
+.sge-plank-2 { top: 61%; } 
+
+/* Inner planks - move inward to match narrowing bounce width (30vw) */
+.sge-plank-3 { top: 76%; left: 8%; } 
+.sge-plank-4 { top: 91%; right: 8%; } 
+
+/* Innermost planks - move inward more to match narrowest bounce (25vw) */
+.sge-plank-5 { top: 106%; left: 13%; }
+.sge-plank-6 { top: 121%; right: 13%; }
+
+/* Text reveals container - FOREGROUND */
+.sge-reveals {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 20;
+}
+
+/* Text reveals - base */
+.sge-reveal {
+  position: absolute;
+  opacity: 0;
+  pointer-events: none;
+  max-width: 40%;
+}
+
+.sge-reveal h2 {
+  font-size: clamp(1.5rem, 4vw, 3rem);
+  font-weight: 700;
+  margin: 0;
+  text-shadow: 0 0 40px rgba(0, 0, 0, 0.8);
+}
+
+/* Text on RIGHT when ball goes LEFT (reveals 1, 3, 5) */
+.sge-reveal-1,
+.sge-reveal-3,
+.sge-reveal-5 {
+  right: 5%;
+  text-align: right;
+}
+
+.sge-reveal-1 { top: 15%; color: #a5b4fc; }
+.sge-reveal-3 { top: 45%; color: #6ee7b7; }
+.sge-reveal-5 { top: 75%; color: #f472b6; }
+
+/* Text on LEFT when ball goes RIGHT (reveals 2, 4, 6) */
+.sge-reveal-2,
+.sge-reveal-4,
+.sge-reveal-6 {
+  left: 5%;
+  text-align: left;
+}
+
+.sge-reveal-2 { top: 30%; color: #fbbf24; }
+.sge-reveal-4 { top: 60%; color: #22d3ee; }
+.sge-reveal-6 { top: 85%; color: #a78bfa; }
