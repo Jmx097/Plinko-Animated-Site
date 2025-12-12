@@ -1,4 +1,48 @@
 document.addEventListener("DOMContentLoaded", function () {
+  // Generate starfield
+  const starfield = document.querySelector(".sge-starfield");
+  if (starfield) {
+    const starCount = 200;
+    const sizes = ["small", "medium", "large"];
+    const sizeWeights = [0.7, 0.25, 0.05]; // Most stars are small
+    
+    for (let i = 0; i < starCount; i++) {
+      const star = document.createElement("div");
+      star.className = "sge-star";
+      
+      // Random weighted size selection
+      const rand = Math.random();
+      let size;
+      if (rand < sizeWeights[0]) {
+        size = sizes[0];
+      } else if (rand < sizeWeights[0] + sizeWeights[1]) {
+        size = sizes[1];
+      } else {
+        size = sizes[2];
+      }
+      star.classList.add(`sge-star-${size}`);
+      
+      // Random twinkle animation
+      const twinkle = Math.floor(Math.random() * 3) + 1;
+      star.classList.add(`sge-star-twinkle-${twinkle}`);
+      
+      // Random position across entire viewport
+      star.style.left = `${Math.random() * 100}%`;
+      star.style.top = `${Math.random() * 100}%`;
+      
+      // Random animation delay for natural effect
+      star.style.animationDelay = `${Math.random() * 5}s`;
+      
+      // Slight color variation for some stars (blue/warm tints)
+      if (Math.random() > 0.85) {
+        const hue = Math.random() > 0.5 ? 220 : 40; // Blue or warm
+        star.style.background = `hsl(${hue}, 70%, 80%)`;
+      }
+      
+      starfield.appendChild(star);
+    }
+  }
+
   if (typeof gsap === "undefined" || typeof ScrollTrigger === "undefined") {
     return;
   }
