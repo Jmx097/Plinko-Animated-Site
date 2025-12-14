@@ -65,10 +65,17 @@ document.addEventListener("DOMContentLoaded", function () {
   // Panel reveal animations
   const panels = gsap.utils.toArray(".sge-panel");
 
-  panels.forEach((panel) => {
+  panels.forEach((panel, i) => {
     const inner = panel.querySelector(".sge-panel-inner");
     if (!inner) return;
 
+    // Panel 1 (index 0): visible immediately - no scroll required
+    if (i === 0) {
+      gsap.set(inner, { opacity: 1, y: 0 });
+      return;
+    }
+
+    // Other panels: reveal on scroll
     gsap.from(inner, {
       opacity: 0,
       y: 80,

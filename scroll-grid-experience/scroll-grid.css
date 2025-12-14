@@ -316,3 +316,181 @@ body {
 .sge-reveal-2 { top: 30%; color: #fbbf24; }
 .sge-reveal-4 { top: 60%; color: #22d3ee; }
 .sge-reveal-6 { top: 85%; color: #a78bfa; }
+
+/* ============================================
+   PANEL 1: ABOVE THE FOLD HERO LAYOUT
+   ============================================ */
+
+/* Panel 1: force true "above the fold" fit */
+.sge-panel-1 {
+  height: 100svh;
+  min-height: 100vh;
+  padding: clamp(1rem, 3vw, 2.25rem);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  z-index: 10; /* Content in front of ball */
+}
+
+.sge-panel-1 .sge-panel-inner {
+  max-width: min(800px, 90vw);
+  width: 100%;
+  text-align: center;
+}
+
+/* Hero content container */
+.sge-hero-content {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: clamp(1rem, 2vw, 1.5rem);
+}
+
+/* Tagline container with background */
+.sge-hero-tagline {
+  display: inline-flex;
+  flex-direction: column;
+  align-items: center;
+  font-size: clamp(0.8rem, 1vw, 0.95rem);
+  font-weight: 600;
+  letter-spacing: 0.03em;
+  color: #1f2937;
+  margin: 0;
+  padding: 0.75rem 1.5rem;
+  border-radius: 16px;
+  position: relative;
+  line-height: 1.6;
+  text-align: center;
+}
+
+/* Each tagline line */
+.sge-tagline-line {
+  display: block;
+  opacity: 0;
+  animation: sge-hero-fade-in 1s ease-out forwards;
+  text-shadow: 0 0 20px rgba(255, 255, 255, 0.6), 0 0 40px rgba(255, 255, 255, 0.3);
+}
+
+/* Staggered delays for each line - slower cascade */
+.sge-fade-in-1 { animation-delay: 0.2s; }
+.sge-fade-in-2 { animation-delay: 0.7s; }
+.sge-fade-in-3 { animation-delay: 1.2s; }
+
+/* Background behind tagline */
+.sge-hero-tagline::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: rgba(255, 255, 255, 0.2);
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  border-radius: 16px;
+  z-index: -1;
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+}
+
+/* Main headline - large and bold */
+.sge-hero-headline {
+  font-size: clamp(2rem, 5vw, 3.5rem);
+  font-weight: 700;
+  line-height: 1.15;
+  margin: 0;
+  color: #f9fafb;
+  text-shadow: 0 0 60px rgba(0, 0, 0, 0.5);
+}
+
+/* Description paragraph */
+.sge-hero-description {
+  font-size: clamp(1rem, 1.3vw, 1.2rem);
+  line-height: 1.6;
+  color: rgba(255, 255, 255, 0.75);
+  max-width: 600px;
+  margin: 0;
+}
+
+/* CTA buttons container */
+.sge-hero-cta {
+  display: flex;
+  gap: clamp(0.75rem, 1.5vw, 1rem);
+  margin-top: clamp(0.5rem, 1vw, 1rem);
+  flex-wrap: wrap;
+  justify-content: center;
+}
+
+/* Base button styles */
+.sge-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: clamp(0.7rem, 1.2vw, 0.9rem) clamp(1.25rem, 2vw, 1.75rem);
+  font-size: clamp(0.9rem, 1vw, 1rem);
+  font-weight: 600;
+  border-radius: 12px;
+  text-decoration: none;
+  transition: all 0.25s ease;
+  cursor: pointer;
+}
+
+.sge-btn-icon {
+  flex-shrink: 0;
+}
+
+/* Primary button - solid gradient */
+.sge-btn--primary {
+  background: linear-gradient(135deg, #3b82f6, #6366f1);
+  color: #fff;
+  border: none;
+  box-shadow: 0 4px 20px rgba(59, 130, 246, 0.4);
+}
+
+.sge-btn--primary:hover {
+  background: linear-gradient(135deg, #2563eb, #4f46e5);
+  box-shadow: 0 6px 30px rgba(59, 130, 246, 0.5);
+  transform: translateY(-2px);
+}
+
+/* Secondary button - ghost/outline */
+.sge-btn--secondary {
+  background: rgba(255, 255, 255, 0.08);
+  color: #f9fafb;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+}
+
+.sge-btn--secondary:hover {
+  background: rgba(255, 255, 255, 0.15);
+  border-color: rgba(255, 255, 255, 0.35);
+}
+
+/* Fade-in animation */
+@keyframes sge-hero-fade-in {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.sge-fade-in {
+  opacity: 0;
+  animation: sge-hero-fade-in 0.8s ease-out forwards;
+}
+
+/* Staggered delays */
+.sge-hero-tagline.sge-fade-in { animation-delay: 0.1s; }
+.sge-hero-headline.sge-fade-in { animation-delay: 0.25s; }
+.sge-hero-description.sge-fade-in { animation-delay: 0.4s; }
+.sge-hero-cta.sge-fade-in { animation-delay: 0.55s; }
+
+/* WordPress full-width breakout (apply if theme constrains width) */
+.sge-scroll-root {
+  width: 100vw;
+  position: relative;
+  left: 50%;
+  margin-left: -50vw;
+}
