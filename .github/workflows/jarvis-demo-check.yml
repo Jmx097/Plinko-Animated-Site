@@ -1,0 +1,31 @@
+name: JARVIS Demo Checks
+
+on:
+  pull_request:
+    paths:
+      - "jarvis-hologram-demo/**"
+      - ".github/workflows/jarvis-demo-check.yml"
+  push:
+    branches:
+      - "feat/plinko-jarvis-cinematic-demo"
+    paths:
+      - "jarvis-hologram-demo/**"
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+      - name: Use Node 22
+        uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+      - name: Check JavaScript syntax
+        run: |
+          node --check jarvis-hologram-demo/src/main.js
+          node --check jarvis-hologram-demo/src/render.js
+          node --check jarvis-hologram-demo/tests/smoke.mjs
+      - name: Run static smoke tests
+        run: node jarvis-hologram-demo/tests/smoke.mjs
