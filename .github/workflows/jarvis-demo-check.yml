@@ -29,3 +29,19 @@ jobs:
           node --check jarvis-hologram-demo/tests/smoke.mjs
       - name: Run static smoke tests
         run: node jarvis-hologram-demo/tests/smoke.mjs
+      - name: Install browser test dependencies
+        run: |
+          npm install --no-save playwright
+          npx playwright install --with-deps chromium
+      - name: Start the local static site
+        run: |
+          nohup python3 -m http.server 8080 --directory jarvis-hologram-demo > /tmp/jarvis-preview.log 2>&1 &
+      - name: Run desktop and mobile browser checks
+        run: node jarvis-hologram-demo/tests/browser.mjs
+      - name: Upload visual screenshots
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: jarvis-hologram-screenshots
+          path: jarvis-hologram-demo/tests/artifacts/
+          if-no-files-found: warn
