@@ -15,7 +15,7 @@ A **zero-API-key**, browser-rendered, interactive JARVIS-style proof of concept 
 - This is a **scripted demonstration**, **not a ChatGPT/Gemini/Claude integration**.
 - Numbers like "48 leads" are illustrative, **not connected to a client's live CRM**.
 - Clicking scenarios and recognizing keywords triggers pre-authored spoken responses. Free-form questions do not receive LLM-generated answers.
-- Browser speech recognition is not truly streaming full-duplex AI audio; it is **turn-based STT → script → browser TTS**. In some browsers it relies on a vendor speech service, so "no API bill" does not mean all audio is offline.
+- Browser speech recognition is not truly streaming full-duplex AI audio; it is **turn-based STT → script → browser TTS**. The hands-free loop is best-effort, and can be interrupted by browser microphone restrictions. In some browsers it relies on a vendor speech service, so "no API bill" does not mean all audio is offline.
 - Speech recognition is most dependable in supported Chromium browsers; other browsers may only support text input and speech output.
 - Performance depends on the viewer's device/GPU. Lower graphics quality with the built-in toggle.
 
@@ -40,7 +40,7 @@ Three.js is loaded from a public CDN using an **import map**, so an internet con
 - **02 — Visualize a pipeline:** face morphs into animated graph with **illustrative** metrics
 - **03 — Show agent capabilities:** simulated agent workflow narrative
 - **Run showcase:** automated guided sequence through all three scenes
-- **Microphone** or **Space:** speech recognition (if supported by the browser)
+- **Microphone** or **Space:** start/stop a hands-free **scripted** multi-turn conversation (if speech recognition is supported); the browser attempts to re-arm listening after each spoken answer. Browser security restrictions may prevent automatic re-arming.
 - **Type + Enter:** offline keyword routing to scripted scenes
 - **Esc:** reset to face
 - **Low power:** lower particle count and render resolution
