@@ -13,6 +13,8 @@ let speechGeneration = 0;
 let isListening = false;
 let showToken = 0;
 let recognition = null;
+let conversationActive = false;
+let resumeTimer = null;
 let notificationTimer;
 let stage = "face";
 let viz = null;
@@ -97,12 +99,16 @@ function preferredVoice(){
   return voices.find(v=>/^en/.test(v.lang)&&/Daniel|Aaron|Microsoft|Google|Samantha/i.test(v.name))
     ||voices.find(v=>/^en/.test(v.lang))||null;
 }
+function scheduleListen(){
+  clearTimeout(resumeTimer);
+  if(conversationActive)resumeTimer=setTimeout(()=>{if(conversationActive&&!isListening&&!activeSpeech)startRecognition();},650);
+}
 function speak(text){
-  if(!soundEnabled||!("speechSynthesis" in window))return Promise.resolve();
+  if(!soundEnabled||!("speechSynthesis" in window)){scheduleListen();return Promise.resolve();}
   return new Promise(resolve=>{
     let done=false;
     const generation=++speechGeneration;
-    const finish=()=>{if(!done){done=true;if(generation===speechGeneration){activeSpeech=false;viz?.setSpeaking(false);if(!isListening)setStatus(stage==="face"?"CONNECTED":"VISUALIZING");}resolve();}};
+    const finish=()=>{if(!done){done=true;if(generation===speechGeneration){activeSpeech=false;viz?.setSpeaking(false);if(!isListening)setStatus(stage==="face"?"CONNECTED":"VISUALIZING");scheduleListen();}resolve();}};
     try{
       speechSynthesis.cancel();
       const utterance=new SpeechSynthesisUtterance(text);
@@ -146,7 +152,7 @@ async function showcase(){
   }finally{if(token===showToken)restoreShowcaseButton();}
 }
 function reset(){
-  showToken++;cancelSpeech();
+  showToken++;conversationActive=false;clearTimeout(resumeTimer);cancelSpeech();
   try{recognition?.abort();}catch{}
   isListening=false;viz?.setListening(false);micButton.classList.remove("is-listening");micButton.setAttribute("aria-pressed","false");
   restoreShowcaseButton();stage="face";viz?.setMode("face");updateContent("introduce");setStatus("STANDBY");
@@ -163,22 +169,34 @@ function setSound(on){
   if(on&&!soundEnabled)notify("Spoken output is unavailable in this browser.");
 }
 function listen(){
-  if(isListening){try{recognition?.stop();}catch{}return;}
+  if(conversationActive){
+    conversationActive=false;clearTimeout(resumeTimer);
+    try{recognition?.abort();}catch{}
+    cancelSpeech();isListening=false;viz?.setListening(false);
+    micButton.classList.remove("is-listening");micButton.setAttribute("aria-pressed","false");
+    $("modeHint").textContent="TAP MICROPHONE OR TYPE A COMMAND";setStatus("STANDBY");return;
+  }
+  conversationActive=true;
+  $("modeHint").textContent="HANDS-FREE SCRIPTED DEMO · TAP MIC TO END";
+  showToken++;cancelSpeech();restoreShowcaseButton();startRecognition();
+}
+function startRecognition(){
+  if(!conversationActive||isListening||activeSpeech)return;
   const Rec=window.SpeechRecognition||window.webkitSpeechRecognition;
-  if(!Rec){notify("This browser has no speech-recognition API. Type a command or try desktop Chrome.");$("voiceLink").textContent="TEXT INPUT";input.focus();return;}
-  showToken++;cancelSpeech();restoreShowcaseButton();
+  if(!Rec){conversationActive=false;notify("This browser has no speech-recognition API. Type a command or try desktop Chrome.");$("voiceLink").textContent="TEXT INPUT";input.focus();return;}
   try{
     recognition=new Rec();recognition.lang="en-US";recognition.interimResults=false;recognition.continuous=false;recognition.maxAlternatives=1;
     recognition.onstart=()=>{isListening=true;viz?.setListening(true);micButton.classList.add("is-listening");micButton.setAttribute("aria-pressed","true");setStatus("LISTENING");};
-    recognition.onresult=e=>{const words=e.results?.[0]?.[0]?.transcript||"";if(words.trim())runTextCommand(words);};
+    recognition.onresult=e=>{const words=e.results?.[0]?.[0]?.transcript||"";if(/^(jarvis )?(stop listening|end conversation|go to sleep)/i.test(words.trim())){listen();return;}if(words.trim())runTextCommand(words);};
     recognition.onerror=e=>{
+      if(["not-allowed","service-not-allowed","network"].includes(e.error))conversationActive=false;
       if(e.error==="not-allowed"||e.error==="service-not-allowed")notify("Microphone permission denied. You can type a command.");
       else if(e.error==="network")notify("This browser's speech recognition needs a network connection. Typed commands still work.");
       else if(e.error!=="no-speech"&&e.error!=="aborted")notify("Speech recognition: "+e.error);
     };
-    recognition.onend=()=>{isListening=false;viz?.setListening(false);micButton.classList.remove("is-listening");micButton.setAttribute("aria-pressed","false");if(!activeSpeech)setStatus(stage==="face"?"STANDBY":"VISUALIZING");};
+    recognition.onend=()=>{isListening=false;viz?.setListening(false);micButton.classList.remove("is-listening");micButton.setAttribute("aria-pressed","false");if(!activeSpeech){setStatus(stage==="face"?"STANDBY":"VISUALIZING");scheduleListen();}};
     recognition.start();
-  }catch(e){notify("Unable to start voice recognition: "+e.message);}
+  }catch(e){conversationActive=false;notify("Unable to start voice recognition: "+e.message);}
 }
 document.querySelectorAll("[data-command]").forEach(button=>button.addEventListener("click",()=>runScenario(button.dataset.command)));
 $("showcaseButton").addEventListener("click",showcase);
@@ -195,3 +213,4 @@ $("voiceLink").textContent=(window.SpeechRecognition||window.webkitSpeechRecogni
 setStatus("STANDBY");
 viz=createHologram($("hologram"),{lowPower,onError:()=>notify("WebGL unavailable. Showing a lightweight CSS hologram instead."),onFPS:value=>$("fpsValue").textContent=value+" FPS",onPulse:value=>$("neuralReadout").textContent=value});
 if(window.isSecureContext===false)notify("Microphone input requires HTTPS or localhost. Visuals and typing still work.");
+document.addEventListener("visibilitychange",()=>{if(document.hidden&&conversationActive)listen();});
