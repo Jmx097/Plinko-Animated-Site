@@ -9,6 +9,7 @@ const transcript = $("transcriptLines");
 const input = $("commandInput");
 let soundEnabled = "speechSynthesis" in window;
 let activeSpeech = false;
+let speechGeneration = 0;
 let isListening = false;
 let showToken = 0;
 let recognition = null;
@@ -87,6 +88,8 @@ function detectIntent(text){
 function cancelSpeech(){
   if("speechSynthesis" in window){try{speechSynthesis.cancel();}catch{}}
   activeSpeech=false;
+  speechGeneration++;
+  viz?.setSpeaking(false);
 }
 function preferredVoice(){
   if(!("speechSynthesis" in window))return null;
@@ -98,20 +101,21 @@ function speak(text){
   if(!soundEnabled||!("speechSynthesis" in window))return Promise.resolve();
   return new Promise(resolve=>{
     let done=false;
-    const finish=()=>{if(!done){done=true;activeSpeech=false;if(!isListening)setStatus(stage==="face"?"CONNECTED":"VISUALIZING");resolve();}};
+    const generation=++speechGeneration;
+    const finish=()=>{if(!done){done=true;if(generation===speechGeneration){activeSpeech=false;viz?.setSpeaking(false);if(!isListening)setStatus(stage==="face"?"CONNECTED":"VISUALIZING");}resolve();}};
     try{
       speechSynthesis.cancel();
       const utterance=new SpeechSynthesisUtterance(text);
       utterance.lang="en-US";utterance.rate=.96;utterance.pitch=.79;utterance.volume=1;
       const voice=preferredVoice();if(voice)utterance.voice=voice;
       utterance.onend=finish;utterance.onerror=finish;
-      activeSpeech=true;setStatus("SPEAKING");speechSynthesis.speak(utterance);
+      activeSpeech=true;viz?.setSpeaking(true);setStatus("SPEAKING");speechSynthesis.speak(utterance);
       setTimeout(finish,Math.min(32000,Math.max(8000,text.length*105)));
     }catch{finish();}
   });
 }
 function runScenario(which,{fromShowcase=false,spokenQuestion=""}={}){
-  if(!fromShowcase)showToken++;
+  if(!fromShowcase){showToken++;restoreShowcaseButton();}
   cancelSpeech();stage=which==="introduce"?"face":"network";
   viz?.setMode(which==="introduce"?"face":"network");
   updateContent(which);setStatus(SCENARIOS[which].status);
@@ -144,7 +148,7 @@ async function showcase(){
 function reset(){
   showToken++;cancelSpeech();
   try{recognition?.abort();}catch{}
-  isListening=false;micButton.classList.remove("is-listening");micButton.setAttribute("aria-pressed","false");
+  isListening=false;viz?.setListening(false);micButton.classList.remove("is-listening");micButton.setAttribute("aria-pressed","false");
   restoreShowcaseButton();stage="face";viz?.setMode("face");updateContent("introduce");setStatus("STANDBY");
 }
 function setLowPower(on){
@@ -162,17 +166,17 @@ function listen(){
   if(isListening){try{recognition?.stop();}catch{}return;}
   const Rec=window.SpeechRecognition||window.webkitSpeechRecognition;
   if(!Rec){notify("This browser has no speech-recognition API. Type a command or try desktop Chrome.");$("voiceLink").textContent="TEXT INPUT";input.focus();return;}
-  showToken++;cancelSpeech();
+  showToken++;cancelSpeech();restoreShowcaseButton();
   try{
     recognition=new Rec();recognition.lang="en-US";recognition.interimResults=false;recognition.continuous=false;recognition.maxAlternatives=1;
-    recognition.onstart=()=>{isListening=true;micButton.classList.add("is-listening");micButton.setAttribute("aria-pressed","true");setStatus("LISTENING");};
+    recognition.onstart=()=>{isListening=true;viz?.setListening(true);micButton.classList.add("is-listening");micButton.setAttribute("aria-pressed","true");setStatus("LISTENING");};
     recognition.onresult=e=>{const words=e.results?.[0]?.[0]?.transcript||"";if(words.trim())runTextCommand(words);};
     recognition.onerror=e=>{
       if(e.error==="not-allowed"||e.error==="service-not-allowed")notify("Microphone permission denied. You can type a command.");
       else if(e.error==="network")notify("This browser's speech recognition needs a network connection. Typed commands still work.");
       else if(e.error!=="no-speech"&&e.error!=="aborted")notify("Speech recognition: "+e.error);
     };
-    recognition.onend=()=>{isListening=false;micButton.classList.remove("is-listening");micButton.setAttribute("aria-pressed","false");if(!activeSpeech)setStatus(stage==="face"?"STANDBY":"VISUALIZING");};
+    recognition.onend=()=>{isListening=false;viz?.setListening(false);micButton.classList.remove("is-listening");micButton.setAttribute("aria-pressed","false");if(!activeSpeech)setStatus(stage==="face"?"STANDBY":"VISUALIZING");};
     recognition.start();
   }catch(e){notify("Unable to start voice recognition: "+e.message);}
 }
