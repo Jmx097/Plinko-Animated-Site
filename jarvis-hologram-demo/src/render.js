@@ -57,7 +57,7 @@ export function createHologram(container,{lowPower=false,onError=()=>{},onFPS=()
   let mode="face",morph=0,morphTarget=0,pulse=0,speaking=false,listening=false;
   let last=0,time=0,fps=60;
   const pointer={x:0,y:0};
-  const start=performance.now();
+  let assembleStart=performance.now();
   let renderedFrames=0;
   let paused=false;
   const activeLines=[],activeNodes=[];
@@ -265,7 +265,7 @@ export function createHologram(container,{lowPower=false,onError=()=>{},onFPS=()
     }
     morph+=(morphTarget-morph)*Math.min(1,dt*2.4);
     pulse=Math.max(0,pulse-dt*.7);
-    const assemble=Math.min(1,Math.max(0,(performance.now()-start-350)/2300));
+    const assemble=Math.min(1,Math.max(0,(performance.now()-assembleStart-350)/2300));
     const audio=speaking?(.32+.28*Math.abs(Math.sin(time*8.3))):listening?.36:pulse*.28;
     group.rotation.y+=(pointer.x*.13-group.rotation.y)*Math.min(1,dt*2);
     group.rotation.x+=(-pointer.y*.075-group.rotation.x)*Math.min(1,dt*2);
@@ -277,7 +277,7 @@ export function createHologram(container,{lowPower=false,onError=()=>{},onFPS=()
       mat.uniforms.uAssemble.value=assemble;
       mat.uniforms.uAudio.value=audio;
     }
-    if(core){core.material.opacity=(1-morph)*(.69+.12*Math.sin(time*3.2));core.scale.setScalar(1+.055*Math.sin(time*2.1));}
+    if(core){core.material.opacity=(1-morph)*(.69+.12*Math.sin(time*3.2));core.scale.set(1+.055*Math.sin(time*2.1),1.12*(1+.055*Math.sin(time*2.1)),1);}
     for(const line of activeLines)line.material.opacity=morph*.34;
     for(let i=0;i<activeNodes.length;i++){
       const {mesh,ring}=activeNodes[i];
@@ -311,7 +311,7 @@ export function createHologram(container,{lowPower=false,onError=()=>{},onFPS=()
     onError(err);
   }
   return {
-    setMode(next){mode=next;morphTarget=next==="face"?0:1;pulse=1;},
+    setMode(next){mode=next;morphTarget=next==="face"?0:1;pulse=1;if(next==="face")assembleStart=performance.now();},
     setSpeaking(value){speaking=Boolean(value);},
     setListening(value){listening=Boolean(value);},
     setLowPower(value){
