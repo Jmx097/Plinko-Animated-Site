@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+  <meta name="theme-color" content="#020711" />
+  <meta name="description" content="Plinko JARVIS — a cinematic, voice-interactive holographic sales demo." />
+  <title>PLINKO JARVIS // Holographic Intelligence</title>
+  <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin />
+  <link rel="stylesheet" href="./styles.css" />
+  <script type="importmap">
+    {"imports":{"three":"https://cdn.jsdelivr.net/npm/three@0.170.0/build/three.module.js","three/addons/":"https://cdn.jsdelivr.net/npm/three@0.170.0/examples/jsm/"}}
+  </script>
+</head>
+<body>
+  <div class="app-shell">
+    <div class="ambient-glow" aria-hidden="true"></div>
+    <div class="scan-overlay" aria-hidden="true"></div>
+    <header class="topbar">
+      <a class="logo" href="#" aria-label="PLINKO JARVIS home">
+        <span class="logo-symbol" aria-hidden="true"><span></span><span></span><span></span></span>
+        <span class="logo-wordmark">PLINKO<span class="logo-divider">/</span><strong>JARVIS</strong></span>
+      </a>
+      <div class="top-status"><span class="live-dot"></span><span>HOLOGRAPHIC INTELLIGENCE</span><span class="top-status-id">SYS // 001</span></div>
+      <div class="top-actions"><button class="subtle-btn" id="qualityButton" title="Toggle reduced graphics">LOW POWER: OFF</button><span class="version">DEMO v0.1</span></div>
+    </header>
+
+    <main class="cockpit">
+      <aside class="rail rail-left" aria-label="Scenario controls">
+        <div class="eyebrow"><span class="dash"></span> YOUR COMMAND CENTER</div>
+        <h1>Meet intelligence<br /><em>in motion.</em></h1>
+        <p class="lead">Not another floating orb. A reactive digital presence built to make AI automation feel tangible.</p>
+        <div class="panel-section-label">DEMO SCENARIOS <span>03 / SELECT</span></div>
+        <button class="scenario is-active" data-command="introduce">
+          <span class="scenario-icon">01</span>
+          <span><strong>Awaken JARVIS</strong><small>See the hologram come alive</small></span>
+          <span class="scenario-chevron">↗</span>
+        </button>
+        <button class="scenario" data-command="pipeline">
+          <span class="scenario-icon">02</span>
+          <span><strong>Visualize a pipeline</strong><small>Face-to-network transformation</small></span>
+          <span class="scenario-chevron">↗</span>
+        </button>
+        <button class="scenario" data-command="automation">
+          <span class="scenario-icon">03</span>
+          <span><strong>Show agent capabilities</strong><small>What Plinko can automate</small></span>
+          <span class="scenario-chevron">↗</span>
+        </button>
+        <button id="showcaseButton" class="showcase-button"><span class="play-icon">▶</span> RUN SHOWCASE <span class="showcase-duration">~45 SEC</span></button>
+        <div class="left-footer"><span class="tiny-indicator"></span> Visual demo uses illustrative data and scripted responses.</div>
+      </aside>
+
+      <section class="hologram-stage" aria-label="Animated JARVIS hologram">
+        <div class="stage-halo" aria-hidden="true"></div>
+        <div id="hologram" class="hologram-canvas" role="img" aria-label="Living particle-face hologram that transforms into a network visualization">
+          <div class="fallback-hologram" id="fallback" aria-hidden="true"><div class="fallback-head"></div><div class="fallback-neck"></div><div class="fallback-shoulders"></div></div>
+        </div>
+        <div class="tech-reticle reticle-tl" aria-hidden="true">+</div><div class="tech-reticle reticle-tr" aria-hidden="true">+</div>
+        <div class="tech-reticle reticle-bl" aria-hidden="true">+</div><div class="tech-reticle reticle-br" aria-hidden="true">+</div>
+        <div class="stage-top-left">PROJECTED ENTITY <span>// 3D CONSCIOUSNESS</span></div>
+        <div class="stage-top-right">LIVE RENDER <span id="fpsValue">-- FPS</span></div>
+        <div class="floating-marker marker-one">NEURAL FLUX <span id="neuralReadout">0.87</span></div>
+        <div class="floating-marker marker-two">VOICE SYNTHESIS <span id="voiceReadout">STANDBY</span></div>
+        <div class="ring-center" aria-hidden="true"><span></span><span></span></div>
+        <div class="stage-bottom">
+          <div class="presence-status"><span id="presenceDot" class="presence-dot"></span><span id="presenceLabel">STANDBY</span></div>
+          <h2 id="hologramName">J . A . R . V . I . S</h2>
+          <p id="stageSubtitle">JUST A RATHER VERY INTELLIGENT SYSTEM</p>
+        </div>
+      </section>
+
+      <aside class="rail rail-right" aria-label="Hologram intelligence and demo results">
+        <div class="metric-top"><span class="dash"></span> SYSTEM TELEMETRY <span class="metric-number">01—03</span></div>
+        <div class="telemetry">
+          <div class="telemetry-row"><span>VISUAL ENGINE</span><strong>THREE.JS <i class="ready"></i></strong></div>
+          <div class="telemetry-row"><span>VOICE LINK</span><strong id="voiceLink">DETECTING</strong></div>
+          <div class="telemetry-row"><span>REASONING</span><strong>DEMO MODE</strong></div>
+          <div class="telemetry-row"><span>API BILLING</span><strong class="zero-cost">$0.00</strong></div>
+        </div>
+        <div class="data-card" id="dataCard">
+          <div class="data-top"><span class="card-icon">◈</span><span id="resultTag">PLINKO CAPABILITIES</span></div>
+          <h3 id="resultHeading">AI that takes action.</h3>
+          <p id="resultBody">Voice-controlled demonstrations of lead generation, workflow automation, and connected intelligence.</p>
+          <div class="result-data" id="resultData">
+            <div><strong>3D</strong><span>LIVE VISUALS</span></div>
+            <div><strong>0</strong><span>API KEYS</span></div>
+            <div><strong>∞</strong><span>IDEAS</span></div>
+          </div>
+        </div>
+        <div class="transcript">
+          <div class="transcript-header">CONVERSATION FEED <span id="transcriptTime">READY</span></div>
+          <div id="transcriptLines" class="transcript-lines" role="log" aria-live="polite">
+            <div class="transcript-line"><span>JARVIS</span><p>Systems standing by. Select a scenario or activate your microphone.</p></div>
+          </div>
+        </div>
+        <div class="rail-note"><span class="orange-star">✳</span> Narrated scenarios are illustrative, not connected to live client systems.</div>
+      </aside>
+    </main>
+
+    <footer class="command-deck">
+      <div class="command-label"><span class="command-pulse"></span> COMMAND INTERFACE <small id="modeHint">TAP MICROPHONE OR TYPE A COMMAND</small></div>
+      <div class="command-row">
+        <button id="micButton" class="mic-button" type="button" aria-label="Start voice conversation" aria-pressed="false">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-width="1.7"><rect x="9" y="2.5" width="6" height="12" rx="3"/><path d="M5.5 10.5a6.5 6.5 0 0 0 13 0M12 17v4m-4 0h8"/></svg>
+        </button>
+        <form id="commandForm" class="command-form" autocomplete="off">
+          <label class="visually-hidden" for="commandInput">Ask JARVIS</label>
+          <input id="commandInput" type="text" placeholder="Ask JARVIS to show a pipeline, explain automations..." maxlength="240" />
+          <button class="send-button" aria-label="Send command" type="submit">↗</button>
+        </form>
+        <button id="soundButton" class="sound-button is-active" type="button" aria-pressed="true" title="Toggle spoken responses">♪ <span>SOUND ON</span></button>
+      </div>
+      <div class="deck-foot"><span>NO ELEVENLABS · NO API KEY REQUIRED</span><span>PRESS <kbd>SPACE</kbd> TO TALK · <kbd>ESC</kbd> TO RESET</span><span>PLINKO SOLUTIONS © 2026</span></div>
+    </footer>
+    <div id="notification" class="notification" role="status" aria-live="polite"></div>
+  </div>
+  <script type="module" src="./src/main.js"></script>
+</body>
+</html>
