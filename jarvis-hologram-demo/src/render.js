@@ -53,7 +53,7 @@ const FRAGMENT_SHADER=[
 ].join("\n");
 
 export function createHologram(container,{lowPower=false,onError=()=>{},onFPS=()=>{},onPulse=()=>{}}={}){
-  let renderer,scene,camera,group,face,glow,geometry,faceMat,glowMat,dust;
+  let renderer,scene,camera,group,face,glow,geometry,faceMat,glowMat,dust,core;
   let mode="face",morph=0,morphTarget=0,pulse=0,speaking=false,listening=false;
   let last=0,time=0,fps=60;
   const pointer={x:0,y:0};
@@ -112,13 +112,37 @@ export function createHologram(container,{lowPower=false,onError=()=>{},onFPS=()
       for(let i=0;i<115;i+=stride){
         const x=(i/114*2-1)*radius*.94*taper;
         const z=radius*.82*Math.sqrt(Math.max(0,1-(x/(radius*.96*taper+.0001))**2))+.014;
-        add(x,y,z,.015,.2+rand(0,.24));
+        add(x,y,z,.015,.39+rand(0,.34));
       }
     }
     // Warm orange energetic centre: separate particle family.
-    for(let i=0;i<(lowPower?850:2200);i++){
+    for(let i=0;i<(lowPower?1450:3700);i++){
       const a=rand(0,Math.PI*2),r=Math.sqrt(random());
-      add(Math.cos(a)*r*.39,.38+Math.sin(a)*r*.41,.86+Math.cos(a*4+i*.015)*.018,.9,.24+.8*(1-r));
+      add(Math.cos(a)*r*.39,.38+Math.sin(a)*r*.41,1.02+Math.cos(a*4+i*.015)*.018,.9,.54+1.0*(1-r));
+    }
+    // Eyes, brows and a lip contour create a recognizable holographic presence.
+    for(const sign of [-1,1]){
+      for(let band=0;band<8;band++){
+        for(let j=0;j<83;j++){
+          const u=j/82;
+          const x=sign*(.12+u*.52);
+          const y=.86+Math.sin(u*Math.PI)*(.055+band*.006)-band*.016;
+          const z=.91+Math.sin(u*Math.PI)*.035;
+          add(x,y,z,.01,.68+rand(0,.28));
+        }
+      }
+      for(let j=0;j<150;j++){
+        const u=j/149;
+        add(sign*(.09+u*.085),.81-u*.63,.98+Math.sin(u*Math.PI)*.09,.01,.50);
+      }
+    }
+    for(let band=0;band<12;band++){
+      for(let j=0;j<80;j++){
+        const u=j/79;
+        const x=(u-.5)*.45;
+        const y=.04+Math.sin(u*Math.PI)*(.04+band*.003)-band*.011;
+        add(x,y,1.04,.85,.75+rand(0,.35));
+      }
     }
     // Branching amber and blue neural filaments connect head to shoulders.
     for(let k=0;k<58;k+=stride){
@@ -139,7 +163,7 @@ export function createHologram(container,{lowPower=false,onError=()=>{},onFPS=()
           const shoulder=-.92-.17*u-.60*Math.pow(u,2.45);
           const y=shoulder-.58*depth+.06*Math.sin(u*Math.PI)*Math.cos(depth*9);
           const z=.24+(.32-.5*depth)*Math.sin(u*3.1)+.12*Math.cos(u*8);
-          add(x,y,z,depth<.14&&u<.5?.7:.02,.15+(line%8===0?.22:0)+.18*(1-depth));
+          add(x,y,z,depth<.14&&u<.5?.7:.02,.27+(line%8===0?.35:0)+.24*(1-depth));
         }
       }
     }
@@ -197,6 +221,25 @@ export function createHologram(container,{lowPower=false,onError=()=>{},onFPS=()
       ring.position.set(...p);group.add(ring);activeNodes.push({mesh,ring});
     }
   }
+  function createCoreGlow(){
+    const canvas=document.createElement("canvas");
+    canvas.width=256;canvas.height=256;
+    const ctx=canvas.getContext("2d");
+    const radial=ctx.createRadialGradient(128,128,4,128,128,127);
+    radial.addColorStop(0,"rgba(255,240,175,1)");
+    radial.addColorStop(.18,"rgba(255,197,92,1)");
+    radial.addColorStop(.42,"rgba(255,115,25,.70)");
+    radial.addColorStop(.74,"rgba(255,100,14,.16)");
+    radial.addColorStop(1,"rgba(255,100,14,0)");
+    ctx.fillStyle=radial;ctx.fillRect(0,0,256,256);
+    const material=new THREE.SpriteMaterial({
+      map:new THREE.CanvasTexture(canvas),transparent:true,depthWrite:false,
+      blending:THREE.AdditiveBlending,opacity:.75
+    });
+    core=new THREE.Sprite(material);
+    core.position.set(0,.37,1.06);core.scale.set(1.00,1.12,1);
+    group.add(core);
+  }
   function createDust(){
     const random=randFactory(87006),rand=(a,b)=>a+(b-a)*random();
     const pos=[],col=[];
@@ -234,10 +277,11 @@ export function createHologram(container,{lowPower=false,onError=()=>{},onFPS=()
       mat.uniforms.uAssemble.value=assemble;
       mat.uniforms.uAudio.value=audio;
     }
-    for(const line of activeLines)line.material.opacity=morph*.18;
+    if(core){core.material.opacity=(1-morph)*(.69+.12*Math.sin(time*3.2));core.scale.setScalar(1+.055*Math.sin(time*2.1));}
+    for(const line of activeLines)line.material.opacity=morph*.34;
     for(let i=0;i<activeNodes.length;i++){
       const {mesh,ring}=activeNodes[i];
-      mesh.material.opacity=morph*.72;ring.material.opacity=morph*.30;
+      mesh.material.opacity=morph*.85;ring.material.opacity=morph*.53;
       ring.scale.setScalar(1+.08*Math.sin(time*2+i));
     }
     if(dust){dust.rotation.y+=dt*.003;dust.material.opacity=.30+.07*Math.sin(time*.4);}
@@ -253,7 +297,7 @@ export function createHologram(container,{lowPower=false,onError=()=>{},onFPS=()
     camera=new THREE.OrthographicCamera(-3.15,3.15,3.15,-3.15,.1,100);
     camera.position.set(0,0,12);camera.lookAt(0,0,0);
     group=new THREE.Group();scene.add(group);
-    rebuild();createNetwork();createDust();cameraResize();
+    rebuild();createNetwork();createCoreGlow();createDust();cameraResize();
     if(fallback)fallback.style.display="none";
     requestAnimationFrame(frame);
     if("ResizeObserver" in window)new ResizeObserver(cameraResize).observe(container);
